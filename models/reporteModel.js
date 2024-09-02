@@ -10,7 +10,8 @@ const reporteSchema = new Schema(
         con:String,
         art:String,
         dia:String,
-        observaciones:String
+        observaciones:String,
+        estado:Boolean
     },
     {
         timestamps: true

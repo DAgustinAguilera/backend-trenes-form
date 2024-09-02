@@ -30,6 +30,25 @@ app.get("/reportes", async (req, res) => {
     }
   });
 
+  app.delete('/reportes/:id', async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      // Actualiza el documento con el id especificado, estableciendo estado en false
+      const result = await Reporte.updateOne({ _id: id }, { $set: { estado: false } });
+  
+      // Comprueba si se actualizó algún documento
+      if (result.nModified > 0) {
+        res.status(200).json({ ok: true, message: "Reporte marcado como inactivo" });
+      } else {
+        res.status(404).json({ ok: false, message: "Reporte no encontrado" });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ ok: false, error });
+    }
+  });
+
 app.post("/reporte", async (req, res) => {
   try {
     const reporte = await req.body;
@@ -45,7 +64,8 @@ app.post("/reporte", async (req, res) => {
         con:reporte.con,
         art:reporte.art,
         dia:reporte.dia,
-        observaciones:reporte.observaciones
+        observaciones:reporte.observaciones,
+        estado:reporte.estado
       },
     ]);
   } catch (error) {
