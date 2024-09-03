@@ -7,8 +7,22 @@ const Data_Base = require("./models/db");
 const Reporte = require("./models/reporteModel");
 const cors = require("cors");
 const reporteModel = require("./models/reporteModel");
+const passport = require("./auth/auth")
+
 app.use(express.json());
 app.use(cors());
+
+
+app.use(
+  require("express-session")({
+    secret: "vivaperon",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get("/db", async (req, res) => {
   try {
@@ -19,6 +33,16 @@ app.get("/db", async (req, res) => {
     res.status(400).json({ ok: false, error });
   }
 });
+
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile'] }));
+
+  app.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login' }),
+    function(req, res) {
+      // Successful authentication, redirect home.
+      res.redirect('http://localhost:5173');
+    });
 
 app.get("/reportes", async (req, res) => {
     try {
