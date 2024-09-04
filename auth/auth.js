@@ -2,19 +2,32 @@ const passport = require("passport");
 var GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/userModel");
 const { Error } = require("mongoose");
+const JwtStrategy = require("passport-jwt").Strategy;
 
-passport.serializeUser(function (user, done) {
-  done(null, user._id);
-});
-
-passport.deserializeUser(async function (id, done) {
-  try {
-    const foundUser = await User.findById(id);
-    done(null, foundUser);
-  } catch (error) {
-    done(error, null);
+const jwtExtractor = (req) => {
+  let token = null;
+  if (req && req.headers["authorization"]) {
+    token = req.headers["authorization"].split(" ")[1];
   }
-});
+  return token;
+};
+
+passport.use(
+  new JwtStrategy(
+    {
+      jwtFromRequest: jwtExtractor,
+      secretOrKey: "gkerjngkerkjgnerjgnergnerkgnklejngklnerkgnergkneroj"
+    },
+   async function (jwt_payload, done) {
+      try {
+        const foundUser = await User.findOne({ id: jwt_payload.sub })
+        done (null, foundUser)
+      } catch (error) {
+        done(error, null)
+      }
+    }
+  )
+);
 
 passport.use(
   new GoogleStrategy(
@@ -49,4 +62,18 @@ passport.use(
     }
   )
 );
+
+passport.serializeUser(function (user, done) {
+  done(null, user._id);
+});
+
+passport.deserializeUser(async function (id, done) {
+  try {
+    const foundUser = await User.findById(id);
+    done(null, foundUser);
+  } catch (error) {
+    done(error, null);
+  }
+});
+
 module.exports = passport;

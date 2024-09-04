@@ -7,7 +7,8 @@ const Data_Base = require("./models/db");
 const Reporte = require("./models/reporteModel");
 const cors = require("cors");
 const reporteModel = require("./models/reporteModel");
-const passport = require("./auth/auth")
+const passport = require("./auth/auth");
+const generateJWT = require("./helpers/generateJWT");
 
 app.use(express.json());
 app.use(cors());
@@ -40,8 +41,18 @@ app.get('/auth/google',
   app.get('/auth/google/callback', 
     passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login' }),
     function(req, res) {
-      // Successful authentication, redirect home.
-      res.redirect('http://localhost:5173');
+      const {_id, firstname, lastname, email, pictureUrl} = req.user
+      const userData = {
+        sub: _id,
+        firstname,
+        lastname,
+        email,
+        pictureUrl
+      }
+      const jwt = generateJWT(userData)
+      const login_info = JSON.stringify({jwt, user: req.user})
+
+      res.redirect(`http://localhost:5173/?login_info=${login_info}`);
     });
 
 app.get("/reportes", async (req, res) => {
