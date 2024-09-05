@@ -16,7 +16,7 @@ app.use(cors());
 
 app.use(
   require("express-session")({
-    secret: "vivaperon",
+    secret: process.env.SECRET_WEB_TOKEN,
     resave: true,
     saveUninitialized: true,
   })
@@ -49,13 +49,14 @@ app.get('/auth/google',
         email,
         pictureUrl
       }
+      console.log(userData)
       const jwt = generateJWT(userData)
       const login_info = JSON.stringify({jwt, user: req.user})
 
       res.redirect(`http://localhost:5173/?login_info=${login_info}`);
     });
 
-app.get("/reportes", async (req, res) => {
+app.get("/reportes", passport.authenticate("jwt", {session: false}) ,async (req, res) => {
     try {
       const reportes = await Reporte.find();
       res.status(200).json({ data: reportes });
@@ -65,7 +66,7 @@ app.get("/reportes", async (req, res) => {
     }
   });
 
-  app.delete('/reportes/:id', async (req, res) => {
+  app.delete('/reporte/:id',passport.authenticate("jwt", {session: false}) , async (req, res) => {
     const { id } = req.params;
   
     try {
@@ -73,7 +74,7 @@ app.get("/reportes", async (req, res) => {
       const result = await Reporte.updateOne({ _id: id }, { $set: { estado: false } });
   
       // Comprueba si se actualizó algún documento
-      if (result.nModified > 0) {
+      if (result.nModified >= 0) {
         res.status(200).json({ ok: true, message: "Reporte marcado como inactivo" });
       } else {
         res.status(404).json({ ok: false, message: "Reporte no encontrado" });

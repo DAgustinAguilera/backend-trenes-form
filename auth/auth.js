@@ -7,20 +7,20 @@ const JwtStrategy = require("passport-jwt").Strategy;
 const jwtExtractor = (req) => {
   let token = null;
   if (req && req.headers["authorization"]) {
-    token = req.headers["authorization"].split(" ")[1];
+    token = req.headers["authorization"].split(" ")[1]
   }
-  return token;
-};
+  return token
+}
 
 passport.use(
   new JwtStrategy(
     {
       jwtFromRequest: jwtExtractor,
-      secretOrKey: "gkerjngkerkjgnerjgnergnerkgnklejngklnerkgnergkneroj"
+      secretOrKey: process.env.SECRET_WEB_TOKEN,
     },
    async function (jwt_payload, done) {
       try {
-        const foundUser = await User.findOne({ id: jwt_payload.sub })
+        const foundUser = await User.findOne({ _id: jwt_payload.sub })
         done (null, foundUser)
       } catch (error) {
         done(error, null)
