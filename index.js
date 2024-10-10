@@ -45,7 +45,7 @@ app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile'] }));
 
   app.get('/auth/google/callback', 
-    passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login' }),
+    passport.authenticate('google', { failureRedirect: 'https://frontend-trenes-form.vercel.app/login' }),
     function(req, res) {
       const {_id, firstname, lastname, email, pictureUrl} = req.user
       const userData = {
@@ -59,7 +59,7 @@ app.get('/auth/google',
       const jwt = generateJWT(userData)
       const login_info = JSON.stringify({jwt, user: req.user})
 
-      res.redirect(`http://localhost:5173/?login_info=${login_info}`);
+      res.redirect(`https://frontend-trenes-form.vercel.app/?login_info=${login_info}`);
     });
 
 app.get("/reportes", passport.authenticate("jwt", {session: false}) ,async (req, res) => {
