@@ -11,7 +11,6 @@ const passport = require("./auth/auth");
 const generateJWT = require("./helpers/generateJWT");
 
 app.use(express.json());
-app.use(cors());
 
 const corsOptions = {
   origin: 'https://frontend-trenes-form.vercel.app',
