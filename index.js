@@ -13,6 +13,13 @@ const generateJWT = require("./helpers/generateJWT");
 app.use(express.json());
 app.use(cors());
 
+const corsOptions = {
+  origin: 'https://frontend-trenes-form.vercel.app',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11) choke on 204
+};
+
+app.use(cors(corsOptions));
+
 
 app.use(
   require("express-session")({
